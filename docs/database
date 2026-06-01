@@ -1,0 +1,25 @@
+Users
+
+id
+email
+name
+
+Books
+
+id
+title
+author
+cover_image
+
+User Books
+
+user_id
+book_id
+rating
+elo_score
+
+Comparisons
+
+winner_book
+loser_book
+date
