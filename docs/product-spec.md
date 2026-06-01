@@ -2,7 +2,7 @@
 
 I think overall, most of the options in the book tracking space are missing something. Specifically, ranking feels super arbitrary and difficult to figure out, I'm not a bit fan of just giving something 4 stars and calling it a day. Like ranking depends on genre, and I feel like receny bias plays too big a part. I think the relative ranking that Beli uses is much better at representing what people actually think about a product/item.
 
-#Problem Statement
+# Problem Statement
 
 Current Problem
 
@@ -27,7 +27,7 @@ Rankings are often manually maintained.
 Rankings become difficult to update as more books are read.
 Social aspect feel off.
 
-#Target User
+# Target User
 
 Me atm. I want it to figure out my problems before I think about others.
 
@@ -35,7 +35,7 @@ Me atm. I want it to figure out my problems before I think about others.
 
 Users create the most accurate ranking of their reading history thourgh simple head-to-head comparisons.
 
-#MVP Features
+# MVP Features
 
 Must Have
   Library
@@ -56,7 +56,7 @@ Must Have
     Goodreads import
     Reading statistics
 
-#User Flow
+# User Flow
 
 New User
   1. Create account
