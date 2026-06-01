@@ -36,7 +36,7 @@ export function CompareView() {
       <div className="placeholder-card">
         <p>
           No active comparison. Search for a book on the home page, mark it as
-          read, and choose a bucket to start placing it in your ranking.
+          read, and choose a bucket to place it in your library ranking.
         </p>
       </div>
     );
@@ -56,12 +56,16 @@ export function CompareView() {
   return (
     <div>
       <p className="lead">
-        Which is better? Comparing within{" "}
-        <strong>{BUCKET_LABELS[placementFocus.bucket]}</strong> (
-        {placement.comparisonsDone + 1} of several)
+        Finding where <strong>{placementFocus.title}</strong> belongs in{" "}
+        <strong>{BUCKET_LABELS[placementFocus.bucket]}</strong>. Pick the book
+        you prefer—higher or lower in the list depending on your answer.
       </p>
-      <p className="compare-focus-label">
-        New book: <strong>{placementFocus.title}</strong>
+      <p className="hint">
+        Comparison {placement.comparisonsDone + 1} · vs rank #
+        {placement.low <= placement.high
+          ? Math.floor((placement.low + placement.high) / 2) + 1
+          : "—"}{" "}
+        in this bucket
       </p>
 
       <div className="compare-vs">

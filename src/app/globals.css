@@ -291,3 +291,28 @@ h1 {
 .ranked-list {
   list-style: none;
 }
+
+.library-by-bucket {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.bucket-section__title {
+  font-size: 1.1rem;
+  margin: 0 0 0.5rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid #e5e2dd;
+}
+
+.badge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #555;
+  background: #eee;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  vertical-align: middle;
+}

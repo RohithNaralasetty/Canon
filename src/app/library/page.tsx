@@ -6,7 +6,7 @@ export default function LibraryPage() {
     <main>
       <h1>My library</h1>
       <p className="lead">
-        Books you&apos;ve marked as read. Add more from the{" "}
+        Your ranked reads, grouped by how you felt about them. Add books from the{" "}
         <Link href="/">home page</Link>.
       </p>
       <LibraryList />

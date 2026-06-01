@@ -140,9 +140,8 @@ export function HomeFlow() {
       {justPlacedTitle && !placement && (
         <div className="placeholder-card success-card">
           <p>
-            <strong>{justPlacedTitle}</strong> was placed in your ranking. See{" "}
-            <Link href="/rankings">Rankings</Link> or{" "}
-            <Link href="/library">Library</Link>.
+            <strong>{justPlacedTitle}</strong> was placed in your library. See{" "}
+            <Link href="/library">Library</Link> for your ranked list.
           </p>
         </div>
       )}
@@ -157,9 +156,6 @@ export function HomeFlow() {
       <div className="actions">
         <Link href="/library" className="btn btn--secondary">
           View library
-        </Link>
-        <Link href="/rankings" className="btn btn--secondary">
-          View rankings
         </Link>
       </div>
     </>

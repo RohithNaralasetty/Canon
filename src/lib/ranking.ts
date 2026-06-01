@@ -1,7 +1,6 @@
 import { BUCKET_CONFIG } from "./buckets";
 import type { Bucket, UserBook } from "./types";
 
-const STEP = 0.25;
 const MIN_GAP = 0.01;
 
 export function clampToBucket(score: number, bucket: Bucket): number {
@@ -9,33 +8,7 @@ export function clampToBucket(score: number, bucket: Bucket): number {
   return Math.min(max, Math.max(min, score));
 }
 
-/** Simple in-band score update after a comparison (winner beats loser). */
-export function applyComparison(
-  winner: UserBook,
-  loser: UserBook,
-): { winnerScore: number; loserScore: number } {
-  const { min, max } = BUCKET_CONFIG[winner.bucket];
-
-  let winnerScore = Math.min(winner.score + STEP, max);
-  let loserScore = Math.max(loser.score - STEP, min);
-
-  if (winnerScore <= loserScore) {
-    const mid = (winner.score + loser.score) / 2;
-    winnerScore = Math.min(mid + MIN_GAP / 2, max);
-    loserScore = Math.max(mid - MIN_GAP / 2, min);
-  }
-
-  if (winnerScore <= loserScore) {
-    winnerScore = max;
-    loserScore = min;
-  }
-
-  return {
-    winnerScore: clampToBucket(winnerScore, winner.bucket),
-    loserScore: clampToBucket(loserScore, loser.bucket),
-  };
-}
-
+/** Opponents sorted best-first (rank #1 first). */
 export function sortByRank(books: UserBook[]): UserBook[] {
   return [...books].sort((a, b) => {
     if (b.score !== a.score) return b.score - a.score;
@@ -53,23 +26,56 @@ export function opponentsInBucket(
   );
 }
 
-export function maxPlacementComparisons(opponentCount: number): number {
-  if (opponentCount <= 1) return opponentCount;
-  return Math.ceil(Math.log2(opponentCount)) + 2;
-}
-
-export function placementComplete(
-  low: number,
-  high: number,
-  comparisonsDone: number,
-  opponentCount: number,
-): boolean {
-  if (opponentCount === 0) return true;
-  if (opponentCount === 1) return comparisonsDone >= 1;
-  if (high - low <= 1) return true;
-  return comparisonsDone >= maxPlacementComparisons(opponentCount);
-}
-
+/** Compare against the middle index between low and high (inclusive). */
 export function pickOpponentIndex(low: number, high: number): number {
   return Math.floor((low + high) / 2);
+}
+
+/**
+ * After the new book wins vs mid: search among higher-ranked opponents.
+ * After it loses: search among lower-ranked opponents.
+ */
+export function nextPlacementBounds(
+  focusWon: boolean,
+  low: number,
+  high: number,
+  mid: number,
+): { low: number; high: number } {
+  if (focusWon) {
+    return { low, high: mid - 1 };
+  }
+  return { low: mid + 1, high };
+}
+
+/** Insertion binary search is done when low > high. */
+export function isPlacementDone(low: number, high: number): boolean {
+  return low > high;
+}
+
+/**
+ * Set the new book's score so it sorts at insertIndex among opponents (best-first).
+ * insertIndex = how many opponents rank above the new book.
+ */
+export function scoreForInsertion(
+  bucket: Bucket,
+  opponents: UserBook[],
+  insertIndex: number,
+): number {
+  const { min, max } = BUCKET_CONFIG[bucket];
+
+  if (opponents.length === 0) {
+    return BUCKET_CONFIG[bucket].initial;
+  }
+  if (insertIndex <= 0) {
+    const top = opponents[0].score;
+    return clampToBucket(Math.min(max, top + MIN_GAP * 10), bucket);
+  }
+  if (insertIndex >= opponents.length) {
+    const bottom = opponents[opponents.length - 1].score;
+    return clampToBucket(Math.max(min, bottom - MIN_GAP * 10), bucket);
+  }
+
+  const above = opponents[insertIndex - 1].score;
+  const below = opponents[insertIndex].score;
+  return clampToBucket((above + below) / 2, bucket);
 }

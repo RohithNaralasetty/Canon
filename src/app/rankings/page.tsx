@@ -1,14 +1,6 @@
-import { RankingsList } from "@/components/rankings/RankingsList";
+import { redirect } from "next/navigation";
 
+/** Rankings live on the Library page for now. */
 export default function RankingsPage() {
-  return (
-    <main>
-      <h1>My rankings</h1>
-      <p className="lead">
-        Ordered by your comparisons within each bucket. Scores stay hidden—only
-        rank position is shown.
-      </p>
-      <RankingsList />
-    </main>
-  );
+  redirect("/library");
 }

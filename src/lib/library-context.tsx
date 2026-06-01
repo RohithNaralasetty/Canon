@@ -10,10 +10,11 @@ import {
 } from "react";
 import { BUCKET_CONFIG } from "./buckets";
 import {
-  applyComparison,
+  isPlacementDone,
+  nextPlacementBounds,
   opponentsInBucket,
   pickOpponentIndex,
-  placementComplete,
+  scoreForInsertion,
   sortByRank,
 } from "./ranking";
 import type { Bucket, CatalogBook, PlacementSession, UserBook } from "./types";
@@ -24,7 +25,6 @@ type LibraryContextValue = {
   addReadBook: (catalog: CatalogBook, bucket: Bucket) => void;
   pickComparisonWinner: (winnerId: string) => void;
   isInLibrary: (catalogId: string) => boolean;
-  sortedLibrary: UserBook[];
   placementFocus: UserBook | null;
   placementOpponent: UserBook | null;
 };
@@ -73,8 +73,6 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
     (catalogId: string) => library.some((b) => b.catalogId === catalogId),
     [library],
   );
-
-  const sortedLibrary = useMemo(() => sortByRank(library), [library]);
 
   const placementFocus = placement
     ? (library.find((b) => b.id === placement.focusBookId) ?? null)
@@ -128,46 +126,39 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
       if (!placement || !placementFocus || !placementOpponent) return;
 
       const focus = placementFocus;
-      const opponent = placementOpponent;
       const opponents = opponentsInBucket(library, focus.bucket, focus.id);
       const mid = pickOpponentIndex(placement.low, placement.high);
       const focusWon = winnerId === focus.id;
-      const winner = focusWon ? focus : opponent;
-      const loser = focusWon ? opponent : focus;
-      const { winnerScore, loserScore } = applyComparison(winner, loser);
 
-      const newLow = focusWon ? mid + 1 : placement.low;
-      const newHigh = focusWon ? placement.high : mid - 1;
-      const comparisonsDone = placement.comparisonsDone + 1;
-      const done = placementComplete(
-        newLow,
-        newHigh,
-        comparisonsDone,
-        opponents.length,
+      const { low: newLow, high: newHigh } = nextPlacementBounds(
+        focusWon,
+        placement.low,
+        placement.high,
+        mid,
       );
+      const comparisonsDone = placement.comparisonsDone + 1;
 
-      setLibrary((prev) => {
-        const withScores = prev.map((b) => {
-          if (b.id === winner.id) return { ...b, score: winnerScore };
-          if (b.id === loser.id) return { ...b, score: loserScore };
-          return b;
-        });
-        if (!done) return withScores;
-        return withScores.map((b) =>
-          b.id === focus.id ? { ...b, needsPlacement: false } : b,
-        );
-      });
-
-      if (done) {
-        setPlacement(null);
-      } else {
+      if (!isPlacementDone(newLow, newHigh)) {
         setPlacement({
           focusBookId: focus.id,
           low: newLow,
           high: newHigh,
           comparisonsDone,
         });
+        return;
       }
+
+      const insertIndex = newLow;
+      const finalScore = scoreForInsertion(focus.bucket, opponents, insertIndex);
+
+      setPlacement(null);
+      setLibrary((prev) =>
+        prev.map((b) =>
+          b.id === focus.id
+            ? { ...b, score: finalScore, needsPlacement: false }
+            : b,
+        ),
+      );
     },
     [placement, placementFocus, placementOpponent, library],
   );
@@ -178,7 +169,6 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
     addReadBook,
     pickComparisonWinner,
     isInLibrary,
-    sortedLibrary,
     placementFocus,
     placementOpponent,
   };
@@ -194,4 +184,12 @@ export function useLibrary(): LibraryContextValue {
     throw new Error("useLibrary must be used within LibraryProvider");
   }
   return ctx;
+}
+
+/** Books in one bucket, best-first — for Library UI. */
+export function booksInBucketSorted(
+  library: UserBook[],
+  bucket: Bucket,
+): UserBook[] {
+  return sortByRank(library.filter((b) => b.bucket === bucket));
 }
