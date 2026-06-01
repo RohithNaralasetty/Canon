@@ -13,4 +13,13 @@ Goodreads tracks books but does not help users rank them against one another, ma
 
 ## Current Status
 
-Planning phase
+App skeleton (placeholder pages). Docs remain the source of product truth.
+
+## Run locally
+
+```bash
+npm install
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
