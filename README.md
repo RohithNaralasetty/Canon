@@ -1,4 +1,4 @@
-# Canon
+# BookRank
 A platform that helps readers create the definitive ranking of their reading life through head-to-head comparisons.
 
 ## Problem
