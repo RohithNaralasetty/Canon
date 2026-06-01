@@ -10,3 +10,18 @@ Landing Page
        
          Tabs include library, profile, lists
           
+
+
+Library
+↓
+Add Book
+↓
+Search "Stormlight"
+↓
+Book Added
+↓
+System generates comparisons
+↓
+User ranks book against existing books
+↓
+Book finds proper place in rankings
