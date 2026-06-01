@@ -39,18 +39,22 @@ Users create the most accurate ranking of their reading history thourgh simple h
 
 Must Have
   Library
+  
     Add books manually
     Search and add books
     View personal library
   Comparison Stuff
+  
     Present two books
     User selects preferred book
     Rankings update automatically
   Rankings
+  
     View ranked list
     View Top 10 books
     View Bottom 10 books
   Nice to Have
+  
     Tier lists
     Genre-specific rankings
     Goodreads import
