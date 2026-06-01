@@ -1,10 +1,10 @@
-Users
+# Users
 
 id
 email
 name
 
-Books
+# Books
 
 id
 title
@@ -12,7 +12,7 @@ author
 cover_image
 isbn
 
-User Books
+# User Books
 
 user_id
 book_id
@@ -20,7 +20,7 @@ rating
 score
 date_read
 
-Comparisons
+# Comparisons
 
 winner_book
 loser_book
