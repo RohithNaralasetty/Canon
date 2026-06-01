@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AppProviders } from "@/components/providers/AppProviders";
 import { SiteNav } from "@/components/layout/SiteNav";
 import "./globals.css";
 
@@ -16,8 +17,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <SiteNav />
-        {children}
+        <AppProviders>
+          <SiteNav />
+          {children}
+        </AppProviders>
       </body>
     </html>
   );

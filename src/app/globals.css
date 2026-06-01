@@ -193,3 +193,101 @@ h1 {
   gap: 0.75rem;
   margin-top: 1rem;
 }
+
+.flow-section {
+  margin-bottom: 1.5rem;
+}
+
+.flow-section h2 {
+  font-size: 1.1rem;
+  margin: 0 0 0.75rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.hint {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0.5rem 0 0;
+}
+
+.search-results {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  border: 1px solid #e5e2dd;
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.search-results li {
+  border-bottom: 1px solid #eee;
+}
+
+.search-results li:last-child {
+  border-bottom: none;
+}
+
+.search-result-btn {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.search-result-btn:hover {
+  background: #f5f4f2;
+}
+
+.bucket-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+@media (min-width: 480px) {
+  .bucket-picker {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+.bucket-btn {
+  flex: 1;
+  min-width: 8rem;
+}
+
+.compare-book__author {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.compare-focus-label {
+  font-size: 0.9rem;
+  color: #555;
+  margin: 0 0 1rem;
+}
+
+.success-card {
+  border-color: #b8d4be;
+  background: #f0f7f1;
+}
+
+.ranked-list {
+  list-style: none;
+}
