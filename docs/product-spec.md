@@ -31,7 +31,7 @@ Social aspect feel off.
 
 Me atm. I want it to figure out my problems before I think about others.
 
-#Core Value Prop
+# Core Value Prop
 
 Users create the most accurate ranking of their reading history thourgh simple head-to-head comparisons.
 
