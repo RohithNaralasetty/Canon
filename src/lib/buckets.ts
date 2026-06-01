@@ -6,9 +6,12 @@ export const BUCKET_LABELS: Record<Bucket, string> = {
   disliked: "Bad / Disliked",
 };
 
-/** Visible score range per bucket (top rank → bottom rank). */
+/**
+ * Compressed visible score bands (rank #1 → last in bucket).
+ * Order matters more than the number; gaps stay tight within a bucket.
+ */
 export const DISPLAY_BAND: Record<Bucket, { top: number; bottom: number }> = {
-  loved: { top: 10.0, bottom: 6.5 },
-  mid: { top: 6.4, bottom: 3.0 },
-  disliked: { top: 2.9, bottom: 1.0 },
+  loved: { top: 10.0, bottom: 8.0 },
+  mid: { top: 7.9, bottom: 5.0 },
+  disliked: { top: 4.9, bottom: 1.0 },
 };

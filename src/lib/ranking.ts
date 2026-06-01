@@ -50,7 +50,10 @@ export function isPlacementDone(low: number, high: number): boolean {
   return low > high;
 }
 
-/** Score from rank index (0 = best) within a bucket. */
+/**
+ * Score from rank index (0 = best). Uses a compressed curve so #1 vs #4
+ * in the same bucket stays visually close—rank order beats spread.
+ */
 export function displayScoreForRank(
   bucket: Bucket,
   rankIndex: number,
@@ -58,8 +61,11 @@ export function displayScoreForRank(
 ): number {
   const { top, bottom } = DISPLAY_BAND[bucket];
   if (count <= 1) return top;
-  const fraction = rankIndex / (count - 1);
-  const score = top - fraction * (top - bottom);
+
+  const linear = rankIndex / (count - 1);
+  // Ease-out: scores linger nearer the top, then taper toward the floor.
+  const compressed = 1 - Math.pow(1 - linear, 0.65);
+  const score = top - compressed * (top - bottom);
   return Math.round(score * 10) / 10;
 }
 
