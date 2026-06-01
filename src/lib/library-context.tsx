@@ -8,13 +8,15 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { BUCKET_CONFIG } from "./buckets";
+import { DISPLAY_BAND } from "./buckets";
 import {
+  finalizePlacement,
   isPlacementDone,
   nextPlacementBounds,
   opponentsInBucket,
   pickOpponentIndex,
-  scoreForInsertion,
+  recomputeAllDisplayScores,
+  sortByDateRead,
   sortByRank,
 } from "./ranking";
 import type { Bucket, CatalogBook, PlacementSession, UserBook } from "./types";
@@ -22,7 +24,11 @@ import type { Bucket, CatalogBook, PlacementSession, UserBook } from "./types";
 type LibraryContextValue = {
   library: UserBook[];
   placement: PlacementSession | null;
-  addReadBook: (catalog: CatalogBook, bucket: Bucket) => void;
+  addReadBook: (
+    catalog: CatalogBook,
+    bucket: Bucket,
+    dateRead?: string,
+  ) => void;
   pickComparisonWinner: (winnerId: string) => void;
   isInLibrary: (catalogId: string) => boolean;
   placementFocus: UserBook | null;
@@ -31,14 +37,15 @@ type LibraryContextValue = {
 
 const LibraryContext = createContext<LibraryContextValue | null>(null);
 
-const SEED_LIBRARY: UserBook[] = [
+const SEED_LIBRARY: UserBook[] = recomputeAllDisplayScores([
   {
     id: "ub-1",
     catalogId: "cat-1",
     title: "Red Rising",
     author: "Pierce Brown",
     bucket: "loved",
-    score: 9.5,
+    score: 10,
+    dateRead: "2024-06-15",
     needsPlacement: false,
   },
   {
@@ -47,7 +54,8 @@ const SEED_LIBRARY: UserBook[] = [
     title: "Project Hail Mary",
     author: "Andy Weir",
     bucket: "loved",
-    score: 8.75,
+    score: 8.25,
+    dateRead: "2024-11-02",
     needsPlacement: false,
   },
   {
@@ -56,10 +64,11 @@ const SEED_LIBRARY: UserBook[] = [
     title: "Dune",
     author: "Frank Herbert",
     bucket: "mid",
-    score: 5.25,
+    score: 6.4,
+    dateRead: "2023-01-20",
     needsPlacement: false,
   },
-];
+]);
 
 function newUserBookId(): string {
   return `ub-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
@@ -90,36 +99,38 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
     return opponents[index] ?? null;
   }, [placement, placementFocus, library]);
 
-  const addReadBook = useCallback((catalog: CatalogBook, bucket: Bucket) => {
-    const id = newUserBookId();
-    const newBook: UserBook = {
-      id,
-      catalogId: catalog.id,
-      title: catalog.title,
-      author: catalog.author,
-      bucket,
-      score: BUCKET_CONFIG[bucket].initial,
-      needsPlacement: true,
-    };
+  const addReadBook = useCallback(
+    (catalog: CatalogBook, bucket: Bucket, dateRead?: string) => {
+      const id = newUserBookId();
+      const newBook: UserBook = {
+        id,
+        catalogId: catalog.id,
+        title: catalog.title,
+        author: catalog.author,
+        bucket,
+        score: DISPLAY_BAND[bucket].top,
+        dateRead: dateRead || undefined,
+        needsPlacement: true,
+      };
 
-    setLibrary((prev) => {
-      const withNew = [...prev, newBook];
-      const opponents = opponentsInBucket(withNew, bucket, id);
-      if (opponents.length === 0) {
-        setPlacement(null);
-        return withNew.map((b) =>
-          b.id === id ? { ...b, needsPlacement: false } : b,
-        );
-      }
-      setPlacement({
-        focusBookId: id,
-        low: 0,
-        high: opponents.length - 1,
-        comparisonsDone: 0,
+      setLibrary((prev) => {
+        const withNew = [...prev, newBook];
+        const opponents = opponentsInBucket(withNew, bucket, id);
+        if (opponents.length === 0) {
+          setPlacement(null);
+          return finalizePlacement(withNew, id, bucket, 0);
+        }
+        setPlacement({
+          focusBookId: id,
+          low: 0,
+          high: opponents.length - 1,
+          comparisonsDone: 0,
+        });
+        return withNew;
       });
-      return withNew;
-    });
-  }, []);
+    },
+    [],
+  );
 
   const pickComparisonWinner = useCallback(
     (winnerId: string) => {
@@ -148,16 +159,9 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      const insertIndex = newLow;
-      const finalScore = scoreForInsertion(focus.bucket, opponents, insertIndex);
-
       setPlacement(null);
       setLibrary((prev) =>
-        prev.map((b) =>
-          b.id === focus.id
-            ? { ...b, score: finalScore, needsPlacement: false }
-            : b,
-        ),
+        finalizePlacement(prev, focus.id, focus.bucket, newLow),
       );
     },
     [placement, placementFocus, placementOpponent, library],
@@ -186,10 +190,11 @@ export function useLibrary(): LibraryContextValue {
   return ctx;
 }
 
-/** Books in one bucket, best-first — for Library UI. */
-export function booksInBucketSorted(
+export function booksInBucket(
   library: UserBook[],
   bucket: Bucket,
+  sortMode: "rank" | "date",
 ): UserBook[] {
-  return sortByRank(library.filter((b) => b.bucket === bucket));
+  const inBucket = library.filter((b) => b.bucket === bucket);
+  return sortMode === "rank" ? sortByRank(inBucket) : sortByDateRead(inBucket);
 }

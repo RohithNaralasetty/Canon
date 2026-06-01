@@ -8,13 +8,14 @@ import { useLibrary } from "@/lib/library-context";
 import { searchCatalog } from "@/lib/mock-catalog";
 import type { Bucket, CatalogBook } from "@/lib/types";
 
-type Step = "search" | "detail" | "bucket" | "placed";
+type Step = "search" | "detail" | "bucket";
 
 export function HomeFlow() {
   const { addReadBook, isInLibrary, placement } = useLibrary();
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<CatalogBook | null>(null);
   const [step, setStep] = useState<Step>("search");
+  const [dateRead, setDateRead] = useState("");
   const [justPlacedTitle, setJustPlacedTitle] = useState<string | null>(null);
 
   const results = useMemo(() => searchCatalog(query), [query]);
@@ -23,6 +24,7 @@ export function HomeFlow() {
   function selectBook(book: CatalogBook) {
     setSelected(book);
     setStep("detail");
+    setDateRead("");
     setJustPlacedTitle(null);
   }
 
@@ -34,9 +36,10 @@ export function HomeFlow() {
   function chooseBucket(bucket: Bucket) {
     if (!selected) return;
     const title = selected.title;
-    addReadBook(selected, bucket);
+    addReadBook(selected, bucket, dateRead || undefined);
     setSelected(null);
     setQuery("");
+    setDateRead("");
     setStep("search");
     setJustPlacedTitle(title);
   }
@@ -117,10 +120,23 @@ export function HomeFlow() {
 
       {selected && step === "bucket" && (
         <section className="flow-section placeholder-card">
-          <h2>How did you feel about it?</h2>
+          <h2>Finish adding</h2>
           <p className="hint">
-            This sets the score band for <strong>{selected.title}</strong>.
-            You&apos;ll compare only against other books in the same bucket.
+            <strong>{selected.title}</strong> — choose a bucket and optionally
+            when you finished it.
+          </p>
+          <label className="date-read-label" htmlFor="date-read">
+            Date read <span className="hint">(optional)</span>
+          </label>
+          <input
+            id="date-read"
+            type="date"
+            className="search-input"
+            value={dateRead}
+            onChange={(e) => setDateRead(e.target.value)}
+          />
+          <p className="hint" style={{ marginTop: "1rem" }}>
+            How did you feel about it?
           </p>
           <div className="bucket-picker">
             {(["loved", "mid", "disliked"] as const).map((bucket) => (
@@ -134,6 +150,14 @@ export function HomeFlow() {
               </button>
             ))}
           </div>
+          <button
+            type="button"
+            className="btn btn--secondary"
+            style={{ marginTop: "0.75rem" }}
+            onClick={() => setStep("detail")}
+          >
+            Back
+          </button>
         </section>
       )}
 
@@ -141,7 +165,7 @@ export function HomeFlow() {
         <div className="placeholder-card success-card">
           <p>
             <strong>{justPlacedTitle}</strong> was placed in your library. See{" "}
-            <Link href="/library">Library</Link> for your ranked list.
+            <Link href="/library">Library</Link> for scores and rankings.
           </p>
         </div>
       )}
@@ -152,12 +176,6 @@ export function HomeFlow() {
           <CompareView />
         </section>
       )}
-
-      <div className="actions">
-        <Link href="/library" className="btn btn--secondary">
-          View library
-        </Link>
-      </div>
     </>
   );
 }

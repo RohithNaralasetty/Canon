@@ -12,7 +12,9 @@ export type UserBook = {
   title: string;
   author: string;
   bucket: Bucket;
+  /** Display score from bucket + rank; used for sort order. */
   score: number;
+  dateRead?: string;
   needsPlacement: boolean;
 };
 

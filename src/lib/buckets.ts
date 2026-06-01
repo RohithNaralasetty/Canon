@@ -6,11 +6,9 @@ export const BUCKET_LABELS: Record<Bucket, string> = {
   disliked: "Bad / Disliked",
 };
 
-export const BUCKET_CONFIG: Record<
-  Bucket,
-  { min: number; max: number; initial: number }
-> = {
-  loved: { min: 6.5, max: 10, initial: 8.25 },
-  mid: { min: 3, max: 6.5, initial: 4.75 },
-  disliked: { min: 1, max: 3, initial: 2 },
+/** Visible score range per bucket (top rank → bottom rank). */
+export const DISPLAY_BAND: Record<Bucket, { top: number; bottom: number }> = {
+  loved: { top: 10.0, bottom: 6.5 },
+  mid: { top: 6.4, bottom: 3.0 },
+  disliked: { top: 2.9, bottom: 1.0 },
 };
